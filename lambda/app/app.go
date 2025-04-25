@@ -5,15 +5,15 @@ import (
 	"lambda/database"
 )
 
-type Application struct{
-	ApiHandler *api.Api
+type Application struct {
+	LoginHandler    *api.LoginHandler
+	CallbackHandler *api.CallBackHandler
 }
 
-
-func NewApplication() (*Application, error){
+func NewApplication() (*Application, error) {
 	db := database.NewDynamoDBStore()
-	apiHandler := api.NewApi(db)
+	callbackHandler := api.NewCallbackHandler(db)
 	return &Application{
-		ApiHandler: apiHandler,
+		CallbackHandler: callbackHandler,
 	}, nil
 }
