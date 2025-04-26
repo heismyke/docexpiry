@@ -29,7 +29,7 @@ This repository provides a complete solution for tracking document expirations i
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/yourusername/document-expiration-tracker.git
+   git clone https://github.com/yourusername/docexpiry.git
    cd document-expiration-tracker
    ```
 
