@@ -1,3 +1,4 @@
+![screencapture-localhost-3000-summary-2025-04-26-12_56_31](https://github.com/user-attachments/assets/fd9770db-da3f-4723-992d-2c86db588628)
 # Real-Time Document Expiration Tracker
 
 A serverless document management solution that automatically monitors document expiry dates using Go, AWS CDK, and Google APIs.
