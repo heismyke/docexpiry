@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/google/uuid"
 	"io/ioutil"
 	"lambda/api/auth"
 	"lambda/database"
@@ -72,12 +73,6 @@ func (cb *CallBackHandler) OauthCallback(request events.APIGatewayProxyRequest) 
 		return errorResponse(http.StatusInternalServerError, "invalid token", corsHeaders), nil
 	}
 
-	// Store token in database
-	err = cb.databaseStore.StoreToken(token)
-	if err != nil {
-		return errorResponse(http.StatusInternalServerError, "error inserting into database", corsHeaders), nil
-	}
-
 	// Initialize Google services
 	googleServices, err := NewGoogleServices(token)
 	if err != nil {
@@ -89,6 +84,28 @@ func (cb *CallBackHandler) OauthCallback(request events.APIGatewayProxyRequest) 
 	if err != nil {
 		return errorResponse(http.StatusInternalServerError, "failed to get user info", corsHeaders), nil
 	}
+
+	tokenID := uuid.New().String()
+	ttlTime := time.Now().Add(30 * 24 * time.Hour)
+
+	customToken := &types.Token{
+		ID:           tokenID,
+		UserID:       userInfo.ID,
+		Email:        userInfo.Email,
+		AccessToken:  token.AccessToken,
+		TokenType:    token.TokenType,
+		RefreshToken: token.RefreshToken,
+		Expiry:       token.Expiry,
+		ExpiresIn:    int64(token.Expiry.Sub(time.Now()).Seconds()),
+		CreatedAt:    time.Now(),
+		LastUsed:     time.Now(),
+		Revoked:      false,
+		TTL:          ttlTime.Unix(),
+		Raw:          token,
+	}
+
+	// Store token in database
+	err = cb.databaseStore.StoreToken(customToken)
 
 	// Process spreadsheet data
 	sheetProcessor := NewSheetProcessor(googleServices.SheetsService)
